@@ -17,15 +17,15 @@ CARBON_STORAGE_SCHEMAS:
 
 CARBON_STORAGE_AGGREGATIONS:
   - name: "min"
-    pattern: "\.min$"
+    pattern: "\\.min$"
     xFilesFactor: "0.1"
     aggregationMethod: "min"
   - name: "max"
-    pattern: "\.max$"
+    pattern: "\\.max$"
     xFilesFactor: "0.1"
     aggregationMethod: "max"
   - name: "sum"
-    pattern: "\.count$"
+    pattern: "\\.count$"
     xFilesFactor: "0"
     aggregationMethod: "sum"
   - name: "default_average"
