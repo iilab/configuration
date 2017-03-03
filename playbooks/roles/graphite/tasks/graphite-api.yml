@@ -1,11 +1,14 @@
 ---
 - name: checkout Graphite API
-  git: repo=https://github.com/brutasse/graphite-api.git
-       dest={{ graphite_root }}/src/api
-       version={{ GRAPHITE_API_VERSION }}
+  git:
+    repo: "{{ GRAPHITE_API_GIT_URL }}"
+    dest: "{{ graphite_root }}/src/api"
+    version: "{{ GRAPHITE_API_VERSION }}"
 
 - name: install Graphite API dependencies
-  command: "{{ graphite_root }}/bin/pip install -r {{ graphite_root }}/src/api/requirements.txt"
+  pip:
+    virtualenv: "{{ graphite_root }}"
+    requirements: "{{ graphite_root }}/src/api/requirements.txt"
 
 - name: install Graphite API
   command: "{{ graphite_root }}/bin/python setup.py install"
@@ -13,29 +16,23 @@
     chdir: "{{ graphite_root }}/src/api"
 
 - name: install Gunicorn
-  command: "{{ graphite_root }}/bin/pip install gunicorn"
-  args:
-    creates: "{{ graphite_root }}/bin/gunicorn"
-
-- name: create configuration directory for Graphite API
-  file: path={{ graphite_root }}/conf
-        state=directory
-        owner=graphite
-        group=graphite
+  pip:
+    virtualenv: "{{ graphite_root }}"
+    name: gunicorn
 
 - name: configure Graphite API
-  template: src=graphite-api/conf/graphite-api.yml.j2
-            dest={{ graphite_root }}/conf/graphite-api.yml
-            owner=graphite
-            group=graphite
-            mode=0644
+  template:
+    src: graphite-api/conf/graphite-api.yml.j2
+    dest: "{{ graphite_root }}/conf/graphite-api.yml"
+    owner: "{{ graphite_user }}"
+    group: "{{ graphite_group }}"
   notify:
     - Restart Graphite
 
 - name: configure systemd unit files for Graphite API
-  template: src=graphite-api/systemd/{{ item }}.j2
-            dest=/etc/systemd/system/{{ item }}
-            mode=0644
+  template:
+    src: "graphite-api/systemd/{{ item }}.j2"
+    dest: "/etc/systemd/system/{{ item }}"
   with_items:
     - graphite-api.socket
     - graphite-api.service
@@ -46,4 +43,7 @@
   command: systemctl daemon-reload
 
 - name: enable/start Graphite API services
-  service: name=graphite-api enabled=yes state=started
+  service:
+    name: graphite-api
+    enabled: yes
+    state: started

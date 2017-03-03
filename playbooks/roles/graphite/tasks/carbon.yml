@@ -1,11 +1,14 @@
 ---
 - name: checkout Carbon
-  git: repo=https://github.com/graphite-project/carbon.git
-       dest={{ graphite_root }}/src/carbon
-       version={{ GRAPHITE_CARBON_VERSION }}
+  git:
+    repo: "{{ GRAPHITE_CARBON_GIT_URL }}"
+    dest: "{{ graphite_root }}/src/carbon"
+    version: "{{ GRAPHITE_CARBON_VERSION }}"
 
 - name: install Carbon dependencies
-  command: "{{ graphite_root }}/bin/pip install -r {{ graphite_root }}/src/carbon/requirements.txt"
+  pip:
+    virtualenv: "{{ graphite_root }}"
+    requirements: "{{ graphite_root }}/src/carbon/requirements.txt"
 
 - name: install Carbon
   command: "{{ graphite_root }}/bin/python setup.py install"
@@ -14,8 +17,9 @@
     creates: "{{ graphite_root }}/bin/carbon-cache.py"
 
 - name: configure Carbon and storage
-  template: src=carbon/conf/{{ item }}.conf.j2
-            dest={{ graphite_root }}/conf/{{ item }}.conf
+  template:
+    src: "carbon/conf/{{ item }}.conf.j2"
+    dest: "{{ graphite_root }}/conf/{{ item }}.conf"
   with_items:
     - carbon
     - storage-schemas
@@ -23,22 +27,10 @@
   notify:
     - Restart Carbon
 
-- name: set permissions for storage
-  file: path={{ graphite_root }}/storage
-        owner=carbon
-        group=graphite
-        recurse=yes
-        state=directory
-
-- name: set permissions for logging
-  file: path=/var/log/carbon
-        owner=carbon
-        group=graphite
-        state=directory
-
 - name: configure Carbon service definition
-  template: src=carbon/systemd/carbon-cache.service.j2
-            dest=/etc/systemd/system/carbon-cache.service
+  template:
+    src: carbon/systemd/carbon-cache.service.j2
+    dest: /etc/systemd/system/carbon-cache.service
   notify:
     - Restart Carbon
 
@@ -46,4 +38,7 @@
   command: systemctl daemon-reload
 
 - name: enable/start the Carbon service
-  service: name=carbon-cache enabled=yes state=started
+  service:
+    name: carbon-cache
+    enabled: yes
+    state: started

@@ -6,8 +6,8 @@ After=network.target
 Type=forking
 StandardOutput=syslog
 StandardError=syslog
-User=carbon
-Group=graphite
+User={{ carbon_user }}
+Group={{ graphite_group }}
 ExecStart={{ graphite_root }}/bin/carbon-cache.py --config={{ graphite_root }}/conf/carbon.conf --pidfile={{ graphite_root }}/run/carbon-cache.pid --logdir=/var/log/carbon/ start
 ExecReload=/bin/kill -USR1 $MAINPID
 ExecStop={{ graphite_root }}/bin/carbon-cache.py --pidfile={{ graphite_root }}/run/carbon-cache.pid stop

@@ -2,9 +2,9 @@
 Description=graphite-api socket
 
 [Socket]
-SocketUser=graphite
-SocketGroup=graphite
-ListenStream=/opt/graphite/run/graphite-api.sock
+SocketUser={{ graphite_user }}
+SocketGroup={{ graphite_group }}
+ListenStream={{ graphite_root }}/run/graphite-api.sock
 
 [Install]
 WantedBy=sockets.target
