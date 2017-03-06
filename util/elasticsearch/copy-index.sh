@@ -27,12 +27,13 @@ TARGET_INDEX=$4
 
 WORKERS="${5:-6}"
 
-read -d '' filter <<EOF
+read -d '' filter <<EOF || true  #read won't find its delimiter and exit with status 1, this is intentional
 input {
   elasticsearch {
     hosts => "$SOURCE_SERVER"
     index => "$SOURCE_INDEX"    #content for forums
     scroll => "12h"         #must be as long as the run takes to complete
+    scan => true            #scan through all indexes efficiently
     docinfo => true         #necessary to move document_type and document_id over
   }
 }
@@ -40,7 +41,7 @@ input {
 output {
   elasticsearch {
     host => "$TARGET_SERVER"
-    index => "TARGET_INDEX"    #same as above
+    index => "$TARGET_INDEX"    #same as above
     protocol => "http"
     manage_template => false
     document_type => "%{[@metadata][_type]}"
