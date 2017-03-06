@@ -10,13 +10,5 @@
 #  pattern: Regex pattern to match against the metric name
 #  xFilesFactor: Ratio of valid data points required for aggregation to the next retention to occur
 #  aggregationMethod: function to apply to data points for aggregation
-{% for aggregation in CARBON_STORAGE_AGGREGATIONS %}
 
-{% if aggregation.description is defined %}
-# {{ aggregation.description }}
-{% endif %}
-[{{ aggregation.name }}]
-pattern = {{ aggregation.pattern }}
-xFilesFactor = {{ aggregation.xFilesFactor }}
-aggregationMethod = {{ aggregation.aggregationMethod }}
-{% endfor %}
+{{ CARBON_STORAGE_AGGREGATIONS | encode_ini }}

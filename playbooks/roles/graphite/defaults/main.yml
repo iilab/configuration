@@ -47,38 +47,69 @@ graphite_common_deb_deps:
   - pkg-config
   - fontconfig
 
-carbon_user: carbon
-graphite_user: graphite
-graphite_group: graphite
+carbon_user: "carbon"
+graphite_user: "graphite"
+graphite_group: "graphite"
 
 GRAPHITE_NGINX_PORT: 6000
 GRAPHITE_GUNICORN_WORKERS: 3
 
 CARBON_LISTEN_ADDR: 0.0.0.0
 
+CARBON_CONF:
+  cache:
+    USER: "{{ carbon_user }}"
+    CACHE_WRITE_STRATEGY: max
+    MAX_CACHE_SIZE: inf
+    USE_FLOW_CONTROL:  True
+    WHISPER_FALLOCATE_CREATE: True
+    MAX_CREATES_PER_MINUTE: 100
+    MAX_UPDATES_PER_SECOND: 1000
+    LINE_RECEIVER_INTERFACE: "{{ CARBON_LISTEN_ADDR }}"
+    PICKLE_RECEIVER_INTERFACE: "{{ CARBON_LISTEN_ADDR }}"
+    USE_INSECURE_UNPICKLER: False
+    CACHE_QUERY_INTERFACE: "{{ CARBON_LISTEN_ADDR }}"
+    LOG_CACHE_HITS: False
+    LOG_CACHE_QUEUE_SORTS: True
+    LOG_LISTENER_CONNECTIONS: True
+    LOG_UPDATES: False
+    ENABLE_LOGROTATION: True
+    WHISPER_AUTOFLUSH: False
+
+  "cache:1":
+    LINE_RECEIVER_PORT: 2003
+    PICKLE_RECEIVER_PORT: 2004
+    CACHE_QUERY_PORT: 7002
+
 CARBON_STORAGE_SCHEMAS:
-  - name: "carbon"
+  carbon:
     description: "Catches all of Carbon's internal metrics"
     pattern: "carbon.*"
     retentions: "10s:1y"
-  - name: "default"
+  default:
     pattern: ".*"
     retentions: "60s:1y"
 
 CARBON_STORAGE_AGGREGATIONS:
-  - name: "min"
+  min:
     pattern: "\\.min$"
     xFilesFactor: "0.1"
     aggregationMethod: "min"
-  - name: "max"
+  max:
     pattern: "\\.max$"
     xFilesFactor: "0.1"
     aggregationMethod: "max"
-  - name: "sum"
+  sum:
     pattern: "\\.count$"
     xFilesFactor: "0"
     aggregationMethod: "sum"
-  - name: "default_average"
+  default_average:
     pattern: ".*"
     xFilesFactor: "0.5"
     aggregationMethod: "average"
+
+GRAPHITE_API_CONF:
+  search_index: "{{ graphite_root }}/api/index"
+  whisper:
+    directories:
+      - "{{ graphite_storage_root }}"

@@ -1,11 +1,4 @@
 # Schema definitions for Whisper files. Entries are scanned in order,
 # and first match wins. This file is scanned for changes every 60 seconds.
-{% for schema in CARBON_STORAGE_SCHEMAS %}
 
-{% if schema.description is defined %}
-# {{ schema.description }}
-{% endif %}
-[{{ schema.name }}]
-pattern = {{ schema.pattern }}
-retentions = {{ schema.retentions }}
-{% endfor %}
+{{ CARBON_STORAGE_SCHEMAS | encode_ini }}
