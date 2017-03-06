@@ -17,7 +17,7 @@ set -euo pipefail
 #   copy-index.sh SOURCE_SERVER SOURCE_INDEX TARGET_SERVER TARGET_INDEX [WORKERS]
 #
 # Example:
-#   ./copy-index.sh http://localhost:9200 source_index http://localhost:9200 target_index
+#   ./copy-index.sh http://localhost source_index http://localhost target_index
 #
 
 SOURCE_SERVER=$1
