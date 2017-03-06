@@ -11,4 +11,7 @@
   become: True
   gather_facts: True
   roles:
-    - role: graphite
+    - graphite
+    - role: nginx
+      nginx_sites:
+      - graphite
