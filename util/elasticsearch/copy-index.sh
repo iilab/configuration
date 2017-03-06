@@ -43,6 +43,7 @@ output {
     host => "$TARGET_SERVER"
     index => "$TARGET_INDEX"    #same as above
     protocol => "http"
+    port => 80
     manage_template => false
     document_type => "%{[@metadata][_type]}"
     document_id => "%{[@metadata][_id]}"
